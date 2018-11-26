@@ -1,0 +1,247 @@
+package otoczka_jarvis;
+import java.util.Random;
+
+public class Otoczka_Jarvis {
+
+    public static int t1[][];
+    public static int otoczka[][];
+    public static int pkt = 10; //liczba punktow
+    public static int wymiar = 400;
+    public static int ilosc_wymiarow=3;
+    public static int d;
+    public static int g;
+    public static int p;
+    public static int przesuniecie_x;
+    
+    public static void tworzenie_punktów(){
+        Random generator = new Random();
+        int x, y;
+        for(int i=0; i<t1.length; i++) {
+            x = generator.nextInt(wymiar);
+            y = generator.nextInt(wymiar);
+            t1[i][0]=x;
+            t1[i][1]=y;
+        }
+    }
+    public static void wypisanie_punktów(int t[][]){
+        int x=0,y=1;
+        for(int i=0; i<t.length; i++) {
+        System.out.println(i + ": " + t[i][x] + " " + t[i][y]);
+        }
+    }
+    public static void wypisanie_punktów_double(double t[][]){
+        int x=0,y=1;
+        for(int i=0; i<t.length; i++) {
+        System.out.println(i + ": " + t[i][x] + " " + t[i][y]);
+        }
+    }
+    public static int ustalenie_d(int t[][]){
+        int pk=0;
+        for(int i=0; i<t.length-1; i++) {
+            if(t[pk][1]>=t[i+1][1])
+            {
+                if(t[pk][1]==t[i+1][1]) // pk zmienia wartość
+                {
+                    int pk2=i+1;
+                    if(t[pk][0]>t[pk2][0])
+                    {
+                        pk=pk2;
+                    }
+                }
+                else
+                    pk=i+1;
+            }
+        }
+        return pk;
+    }
+    public static int ustalenie_g(int t[][]){
+        int pk=0;
+        for(int i=1; i<t.length-1; i++) {
+            if(t[pk][1]<t[i][1])
+                    pk=i;
+            if(t[pk][1]==t[i][1])
+                if(t[pk][0]<t[i][0])
+                    pk=i;
+        }
+        return pk;
+    }
+    public static void zamiana_punktów(int t[], int tt[]){
+        int zmienna_x=t[0], zmienna_y=t[1];
+        t[0]=tt[0];
+        t[1]=tt[1];
+        tt[0]=zmienna_x;
+        tt[1]=zmienna_y;
+    }
+    public static double[][] tabela(int p[],int q[], int a[], double t[][]){
+        t[0][0]=p[0];
+        t[0][1]=p[1];
+        t[0][2]=1;
+        t[1][0]=q[0];
+        t[1][1]=q[1];
+        t[1][2]=1;
+        t[2][0]=a[0];
+        t[2][1]=a[1];
+        t[2][2]=1;
+        return t;
+    }
+    
+    public static int przejscie_d_do_g(int t[][], int p){
+        int r= p+1;
+        double t_wyz [][]=new double [3][3];
+        int p1[] = {0, 0};
+        int q[] = {200, 0};
+        //tabela(t[p], t[r], q, t_wyz);
+        //Macierz tablica1 = new Macierz(t_wyz);
+        //System.out.println("punkty do wyz");
+        //wypisanie_punktów_double(t_wyz);
+        //double x0  = tablica1.wyznaczWyznacznik();
+        //if(x0<0)
+        double   x0=-100000;
+        double x=0;
+        for(int i=1; i<t.length; i++)
+        {
+            tabela(q, t[i], p1, t_wyz);
+            Macierz tablica2 = new Macierz(t_wyz);
+              x= tablica2.wyznaczWyznacznik();
+              System.out.println("      x:  " + x + " i: " + i);
+            if(x>x0)
+            {
+                r=i;
+                System.out.println("x:  " + x + " i: " + i);
+                x0=x;
+            }
+        }
+        return r;
+    }
+    //wyznaczanie_otoczki(t1[r],otoczka[i],i);
+    public static void kopiowanie_punktu(int t11[],int otoczka1[])
+    {
+        otoczka1[0]=t11[0];
+        otoczka1[1]=t11[1];
+        
+    }
+    public static int[][] przesuniecie (int t[][])
+    {
+        przesuniecie_x=t[0][0];
+        int y = t[0][1];
+        for(int i=0; i<pkt; i++)
+        {
+            t[i][1]=t[i][1]-y;
+            t[i][0]=t[i][0]-przesuniecie_x;
+        }
+        d=0;
+        return t;
+    }
+    public static void wstawienie_punktu (int t[][], int t1[][],int nr, int r)
+    {
+        t[nr][0]=t1[r][0];
+        t[nr][1]=t1[r][1];
+        
+    }
+     public static int[][] kopiowanie_punktów(int t[][], int tt[][]){
+        for(int i=0; i<tt.length; i++) {
+            tt[i][0]=t[i][0];
+            tt[i][1]=t[i][1];
+        }
+        return tt;
+    }
+     
+     public static int liczenie_alfa(int t[][],int p)
+     {
+        
+         double alfa[]=new double [t.length];   //kąt dla każdego punktu
+         double d[] =new double [t.length];     //do wyliczenia alfy
+         int t2 [][] = new int [pkt][ilosc_wymiarow];
+         double x_od_p = t[p][0];
+         double y = t[p][1];
+         int r=0;
+         //for (int i = 0; i < t.length; i++)
+         //    t[i][1]-=y_od_p;
+         System.out.println("nowe zero ooo " + (t[p][1]-y));
+         for (int i = p+1; i < t.length; i++) {
+             d[i]=Math.abs(t[i][0])+Math.abs(t[i][1]-y);
+         }
+         double zmienna = 5;
+         for (int i = p+1; i < t.length; i++)
+         {
+             if(t[i][0]>0 & (t[i][1]-y)>=0)
+                alfa[i] = (t[i][1]-y)/d[i];
+             if(t[i][0]<=0 & (t[i][1]-y)>0)
+                alfa[i] = 2 - (t[i][1]-y)/d[i];
+             if(t[i][0]<0 & (t[i][1]-y)<=0)
+                alfa[i] = 2 + (t[i][1]-y)/d[i];
+             if(t[i][0]>=0 & (t[i][1]-y)<0)
+                alfa[i] = 2 + (t[i][1]-y)/d[i];
+             if(alfa[i]<zmienna)
+             {
+                 zmienna=alfa[i];
+                 r=i;
+             }
+             //System.out.println(" alfa " + i + " wynosi:" + alfa[i] * 180);
+         }
+         zamiana_punktów(t[p+1],t[r]);
+         //System.out.println(" alfa wynosi:" + alfa[r]);
+         return r;
+     }
+    public static void ustalenie_zera(int t[][],int p, int r)
+    {
+        int zmienna = t[p][1] - t[r][1];
+        System.out.println("zmienna w u_0: " + zmienna);
+        for(int i = 0; i < t.length; i++) {
+            t[i][1]+=zmienna;
+        }
+    }
+    public static void main(String[] args) {
+        t1=new int [pkt][ilosc_wymiarow];
+        otoczka=new int [pkt][ilosc_wymiarow];
+        tworzenie_punktów();
+        System.out.println("   Wygenerowane punkty");
+        wypisanie_punktów(t1);
+        d=ustalenie_d(t1);
+        System.out.println("Punkt d (min y następnie x) ma numer: " + d);
+        System.out.println("Przenosze d na 0 - punkt\n"
+                         + "i ustalenie w nim srodka ukladu wspulzednych");
+        zamiana_punktów(t1[0],t1[d]);
+        //System.out.println("\n\nPrzesunięte wartosci: ");
+        przesuniecie(t1);
+        g=ustalenie_g(t1);
+        System.out.println("Punkt g(max y następnie x) ma numer: " + g
+                          + "\nnastępnie przenosimy g na koniec tabeli");
+        zamiana_punktów(t1[g],t1[t1.length-1]);//g na koniec
+        wypisanie_punktów(t1);
+        //sortowanie(t1);
+        
+        System.out.println(" Liczenie otoczki");
+        //kopiowanie_punktów (t1,t2);
+        kopiowanie_punktów (t1,otoczka);
+        p=d;
+        int r ;
+        System.out.println("p wynosi " + p);
+        for (int i = 1; i < t1.length; i++) {
+            r = liczenie_alfa(otoczka,i-1);
+            p=r;
+            System.out.println("nowe zero " + p);
+            if(otoczka[i][1]==t1[t1.length-1][1])
+            {
+                System.out.println("za duzo" + i);
+            }
+        }
+//        for (int i = 1; i < t2.length; i++) {
+//            r = liczenie_alfa(t2,p);
+//            //System.out.println("p wynosi " + p);
+//            kopiowanie_punktu(t2[p],otoczka[i]);
+//            //ustalenie_zera(t2 , p , r);
+//            p=r;
+//            System.out.println("nowe zero " + p);
+//        }
+        
+        //for (int i = 0; i < alfa.length; i++) {
+           // System.out.println("    " + r);
+        wypisanie_punktów(otoczka);
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new rysowanie.trasa().repaint();
+            }
+        });
+    }
+}
